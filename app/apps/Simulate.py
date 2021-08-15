@@ -58,7 +58,6 @@ def app():
 
         #the dataframe in the json
         data = pd.DataFrame.from_dict(json.loads(output_base[str(cap)]))
-
         #simulation column value at this capacity
         sim = data["Simulation_output"].values[0] 
         sim_output = np.array(sim)

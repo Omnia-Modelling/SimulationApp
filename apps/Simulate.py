@@ -21,7 +21,7 @@ def app():
 
     st.write("")
 
-    img_path = os.path.abspath('../data/002_test.png')
+    img_path = os.path.abspath('data/002_test.png')
 
     @st.cache
     def long_running_import():

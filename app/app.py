@@ -13,6 +13,9 @@ from PIL import Image
 
 from apps import Simulate, Capacity, main
 
+import warnings
+warnings.filterwarnings("ignore")
+
 
 app = MultiApp()
 

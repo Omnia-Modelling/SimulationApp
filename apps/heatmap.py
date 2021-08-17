@@ -6,11 +6,7 @@ import pandas as pd
 import random
 import json
 import operator
-from mpl_toolkits.mplot3d import Axes3D
-from matplotlib import cm
-from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-import plotly.graph_objects as go
 import base64
 import os
 import re

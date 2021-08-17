@@ -1,6 +1,0 @@
-normal
-meeting_room
-toilet
-printer
-lunchroom
-coffee_machine

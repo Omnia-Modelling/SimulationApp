@@ -115,8 +115,11 @@ def pageOne(sesh):
             else:
                 x_plot, y_plot = new_df.iloc[np.argmin(abs(new_df.index-float(t))),0], new_df.iloc[np.argmin(abs(new_df.index-float(t))),1]
 
-            sns.kdeplot(x=x_plot, y=y_plot, shade=True, shade_lowest=False, alpha=0.5,
-                    cmap='coolwarm', ax = axs) 
+            try:
+                sns.kdeplot(x=x_plot, y=y_plot, shade=True, shade_lowest=False, alpha=0.5,
+                        cmap='coolwarm', ax = axs)
+            except:
+                None 
             st.pyplot(fig) 
         return None
 

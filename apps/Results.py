@@ -35,7 +35,12 @@ def pageOne(sesh):
                 with z.open(filename) as f:  
                     data = f.read()  
                     d = json.loads(data.decode("utf-8")) 
-        return d
+        
+        with open('data/Paths.json', 'r') as file:
+            Paths = json.load(file)
+           
+        return d, Paths
+    
 
     def make_annotation(office, workers):
         #all loc
@@ -101,9 +106,25 @@ def pageOne(sesh):
                     bbox=dict(boxstyle="round", fc="w"),
                     arrowprops=dict(arrowstyle="->"), size=10)
 
+            def mysplit(s):
+                head = s.rstrip('0123456789')
+                tail = s[len(head):]
+                return tail
+
+
+
             #plotting walking paths
             for j in sim_output[np.array(time_scale)==t]:
-                axs.plot([j[1]['cd_x'], j[2]['cd_x']], [j[1]['cd_y'], j[2]['cd_y']], 'o-', color='black')
+                #person_id = int(j[1]['id']['who'].rstrip('0123456789'))-1
+                person_id = str(int(mysplit(j[1]['who'])))
+                object_id = str(int(mysplit(j[2]['id'])))
+                #print(f'{person_id} -> {object_id}')
+                
+                
+                paths_x, paths_y = paths[person_id][object_id]
+                #st.write(paths_x, paths_y)
+                axs.plot(np.array(paths_x)*10, img.shape[0]-np.array(paths_y)*10, alpha=1, linewidth=3, color='green')
+                #axs.plot([j[1]['cd_x'], j[2]['cd_x']], [j[1]['cd_y'], j[2]['cd_y']], 'o-', color='black')
             st.pyplot(fig) 
 
         #dropdown menu selection #2
@@ -124,7 +145,7 @@ def pageOne(sesh):
         return None
 
     #data
-    output_base = Agent_Simulation_V1()
+    output_base, paths = Agent_Simulation_V1()
     
     #Sidebar
     st.sidebar.write("## Variables")

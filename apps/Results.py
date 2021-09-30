@@ -25,6 +25,7 @@ def pageOne(sesh):
 
     img_path = os.path.abspath('data/002_test.png')
 
+
     #functions
     @st.cache
     def Agent_Simulation_V1():
@@ -38,7 +39,8 @@ def pageOne(sesh):
         
         with open('data/Paths.json', 'r') as file:
             Paths = json.load(file)
-           
+        
+
         return d, Paths
     
 
@@ -62,10 +64,6 @@ def pageOne(sesh):
             coord2y.append(i['cd_y'])
 
         return annotate1+annotate2, coord1x+coord2x, coord1y+coord2y
-    def mysplit(s):
-                head = s.rstrip('0123456789')
-                tail = s[len(head):]
-                return tail
 
     #interactive plots
     def video_slider(t, what, cap, time):
@@ -104,25 +102,61 @@ def pageOne(sesh):
         
         #dropdown menu selection #1
         if what == "Paths":
+
+            #Create Counting dict
+            count = {"meeting_room": 0, "toilet":0, "lunchroom":0,"coffee_machine":0}
+
             #plot all objects in this simulation variant
             for i in range(len(annotate)):
                 axs.annotate(annotate[i], (coordx[i], coordy[i]),va="bottom", ha="center",
                     bbox=dict(boxstyle="round", fc="w"),
                     arrowprops=dict(arrowstyle="->"), size=10)
 
+            def mysplit(s):
+                head = s.rstrip('0123456789')
+                tail = s[len(head):]
+                return tail
+            
+            def mysplithead(s):
+                head = s.rstrip('0123456789')
+                return head
+
+
+
 
             #plotting walking paths
             for j in sim_output[np.array(time_scale)==t]:
+                # Calculate the person)id and the object_id
                 person_id = str(int(mysplit(j[1]['who'])))
                 object_id = str(int(mysplit(j[2]['id'])))
-                #print(f'{person_id} -> {object_id}')
-                
-                
+
+                # Objectname
+                objectname = mysplithead(j[2]['id'])
+
+                # Count the frequencies
+                #count[map_result[object_id]]  += 1
+                count[objectname] += 1
+
+                # Get the path
                 paths_x, paths_y = paths[person_id][object_id]
-                #st.write(paths_x, paths_y)
-                axs.plot(np.array(paths_x)*10, img.shape[0]-np.array(paths_y)*10, alpha=1, linewidth=3, color='green')
-                #axs.plot([j[1]['cd_x'], j[2]['cd_x']], [j[1]['cd_y'], j[2]['cd_y']], 'o-', color='black')
+
+                # Plot the path
+                axs.plot(np.array(paths_x)*10, img.shape[0]-np.array(paths_y)*10, linewidth=3, color='green')
+                #print(f'{person_id} to {object_id}')
             st.pyplot(fig) 
+            
+            # generate bar chart
+            keys = count.keys()
+            values = count.values()
+
+            fig = plt.figure(figsize=(8, 3))
+            ax = fig.add_axes([0,0,1,1])
+            ax.bar(keys, values, color=['#6B2172', '#3D7221', '#2E2172', '#216972'])
+            ax.grid()
+            ax.set_ylim(0, 15)
+            plt.ylabel('Number of People')
+            # Zet in streamlit
+            st.pyplot(fig)
 
         #dropdown menu selection #2
         if what == 'Heatmap':
@@ -133,20 +167,11 @@ def pageOne(sesh):
             else:
                 x_plot, y_plot = new_df.iloc[np.argmin(abs(new_df.index-float(t))),0], new_df.iloc[np.argmin(abs(new_df.index-float(t))),1]
 
-                for j in sim_output[np.array(time_scale)==t]:
-                    person_id = str(int(mysplit(j[1]['who'])))
-                    object_id = str(int(mysplit(j[2]['id'])))
-                paths_x, paths_y = paths[person_id][object_id]
-  
-                x_plot = x_plot*5 + (np.array(paths_x)*10).tolist()
-                y_plot = y_plot*5 + (np.array(paths_y)*10).tolist()
-
-            #try:
-
-            sns.kdeplot(x=x_plot, y=y_plot, shade=True, shade_lowest=False, alpha=0.5,
+            try:
+                sns.kdeplot(x=x_plot, y=y_plot, shade=True, shade_lowest=False, alpha=0.5,
                         cmap='coolwarm', ax = axs)
-            #except:
-            #    None 
+            except:
+                None 
             st.pyplot(fig) 
         return None
 

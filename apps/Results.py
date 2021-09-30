@@ -62,6 +62,10 @@ def pageOne(sesh):
             coord2y.append(i['cd_y'])
 
         return annotate1+annotate2, coord1x+coord2x, coord1y+coord2y
+    def mysplit(s):
+                head = s.rstrip('0123456789')
+                tail = s[len(head):]
+                return tail
 
     #interactive plots
     def video_slider(t, what, cap, time):
@@ -106,16 +110,9 @@ def pageOne(sesh):
                     bbox=dict(boxstyle="round", fc="w"),
                     arrowprops=dict(arrowstyle="->"), size=10)
 
-            def mysplit(s):
-                head = s.rstrip('0123456789')
-                tail = s[len(head):]
-                return tail
-
-
 
             #plotting walking paths
             for j in sim_output[np.array(time_scale)==t]:
-                #person_id = int(j[1]['id']['who'].rstrip('0123456789'))-1
                 person_id = str(int(mysplit(j[1]['who'])))
                 object_id = str(int(mysplit(j[2]['id'])))
                 #print(f'{person_id} -> {object_id}')
@@ -136,11 +133,20 @@ def pageOne(sesh):
             else:
                 x_plot, y_plot = new_df.iloc[np.argmin(abs(new_df.index-float(t))),0], new_df.iloc[np.argmin(abs(new_df.index-float(t))),1]
 
-            try:
-                sns.kdeplot(x=x_plot, y=y_plot, shade=True, shade_lowest=False, alpha=0.5,
+                for j in sim_output[np.array(time_scale)==t]:
+                    person_id = str(int(mysplit(j[1]['who'])))
+                    object_id = str(int(mysplit(j[2]['id'])))
+                paths_x, paths_y = paths[person_id][object_id]
+  
+                x_plot = x_plot*5 + (np.array(paths_x)*10).tolist()
+                y_plot = y_plot*5 + (np.array(paths_y)*10).tolist()
+
+            #try:
+
+            sns.kdeplot(x=x_plot, y=y_plot, shade=True, shade_lowest=False, alpha=0.5,
                         cmap='coolwarm', ax = axs)
-            except:
-                None 
+            #except:
+            #    None 
             st.pyplot(fig) 
         return None
 
